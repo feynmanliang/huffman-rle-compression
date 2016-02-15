@@ -48,25 +48,27 @@ class HuffmanEncoder:
         #     rle.append(currRunLength)
         return rle
 
-    def makeHuffmanCode(self, f):
+    def makeHuffmanCodeFromFile(self, f):
+        """Overload which first converts File object `f` into empirical probabilities. """
+        corpus = self.__rle(f)
+        codes = defaultdict(str)
+        counts = Counter(corpus)
+        return self.makeHuffmanCode(counts)
+
+    def makeHuffmanCode(self, counts):
         """Constructs a Huffman code using empirical symbol occurrences. One leaf
         of the Huffman tree represents `self.maxLength` contiguous zeros, the others
         represents a run of zeros (< `self.maxLength`) terminated by a one.
 
         Args:
-            f (File): The file object where each line is a '0' or '1'.
+            counts (Dict[int,float]): Occurence counts for source symbols.
 
         Returns:
             Dict[int,string]: A map from symbols to Huffman code codewords.
 
         """
-        corpus = self.__rle(f)
-        codes = defaultdict(str)
-        counts = Counter(corpus)
-        N = 1.*sum(counts.values())
-
         # entries in heap: (probability of entry, [(symbol, huffmanCode)])
-        heap = map(lambda x: (x[1]/N, [(x[0], '')]), counts.items())
+        heap = map(lambda x: (x[1], [(x[0], '')]), counts.items())
         heapify(heap)
 
         while len(heap) > 1:
@@ -97,7 +99,7 @@ class HuffmanEncoder:
         """
         runLengths = self.__rle(f)
         if not self.codebook:
-            self.codebook = HuffmanEncoder.makeHuffmanCode(f)
+            self.codebook = HuffmanEncoder.makeHuffmanCodeFromFile(f)
         return ''.join(map(lambda sym: self.codebook[sym], runLengths))
 
     def decode(self, f):
