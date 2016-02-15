@@ -10,6 +10,7 @@
 pyvenv.cfg
 .venv
 pip-selfcheck.json
+*.pyc
 
 .Rproj.user
 .Rhistory
@@ -20,3 +21,5 @@ pip-selfcheck.json
 *.aux
 *.log
 *.out
+*.bbl
+*.blg
