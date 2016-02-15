@@ -1,3 +1,4 @@
+#!/usr/bin/env python
 from collections import Counter, defaultdict
 from heapq import heapify, heappush, heappop
 import itertools

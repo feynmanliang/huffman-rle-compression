@@ -11,11 +11,11 @@ print "maxRunLength,codebook,numBits,numBitErrors"
 for maxRunLength in {3..180}; do
   for codebook in $empiricalCodebook $geometricCodebook; do
     rm $encodeFile $decodeFile
-    python squash.py \
+    squash \
       --maxRunLength $maxRunLength --codebook $codebook --genCodebooks \
       < $origFile > $encodeFile
     numBits=$(wc $encodeFile | tr -s ' ' | cut -d ' ' -f 4)
-    python unsquash.py \
+    unsquash \
       --maxRunLength $maxRunLength --codebook $codebook \
       < $encodeFile > $decodeFile
     delta=$(diff $origFile $decodeFile)

@@ -23,3 +23,6 @@ pip-selfcheck.json
 *.out
 *.bbl
 *.blg
+
+*.tar.gz
+*.pickle
