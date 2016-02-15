@@ -4,6 +4,9 @@ import itertools
 import operator
 import sys
 
+PROB_ONE = 0.01 # f, probability of a bit being a 1
+FILE_SIZE = 10000 # N, number of symbols in the uncompressed file
+
 class HuffmanEncoder:
     """Compression using run-length encoding and Huffman Coding."""
 
@@ -39,6 +42,10 @@ class HuffmanEncoder:
             else:
                 rle.append(currRunLength)
                 currRunLength = 0
+        # Instead can pad the decoding (=> smaller compressed file)
+        # append final run
+        # if currRunLength > 0:
+        #     rle.append(currRunLength)
         return rle
 
     def makeHuffmanCode(self, f):
@@ -118,4 +125,7 @@ class HuffmanEncoder:
                 return "0"*l + "1"
             else:
                 return "0"*l
-        return reduce(operator.add, map(rlToSymbols, runLengths))
+        decoding = reduce(operator.add, map(rlToSymbols, runLengths))
+
+        # pad with final '0' run to FILE_SIZE source symbols
+        return decoding + "0"*(FILE_SIZE - len(decoding))
