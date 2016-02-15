@@ -1,5 +1,11 @@
-rm filep.01.10000.txt.encode filep.01.10000.txt.decode
-python squash.py < filep.01.10000.txt > filep.01.10000.txt.encode
-python unsquash.py < filep.01.10000.txt.encode > filep.01.10000.txt.decode
-wc filep.01.10000.txt.encode
-diff filep.01.10000.txt filep.01.10000.txt.decode
+#!/usr/bin/zsh
+
+origFile=filep.01.10000.txt
+encodeFile=${origFile}.encode
+decodeFile=${origFile}.decode
+
+rm $encodeFile $decodeFile
+python squash.py < $origFile > $encodeFile
+wc $encodeFile
+python unsquash.py < $encodeFile > $decodeFile
+diff $origFile $decodeFile
