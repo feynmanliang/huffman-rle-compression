@@ -1,6 +1,8 @@
 from collections import Counter, defaultdict
 from heapq import heapify, heappush, heappop
 import itertools
+import operator
+import sys
 
 class HuffmanEncoder:
     """Compression using run-length encoding and Huffman Coding."""
@@ -23,15 +25,26 @@ class HuffmanEncoder:
         currRunLength = 0
         for rawLine in f:
             line = int(rawLine.strip())
-            if line == 0 and currRunLength < self.maxLength:
-                currRunLength += 1
+            if line == 0:
+                if currRunLength < self.maxLength-2:
+                    currRunLength += 1
+                else: # need to decide to use all zeros or 1 terminated
+                    # TODO: check f.hasNext()
+                    nextSymb = int(next(f).strip())
+                    if nextSymb == 0:
+                        rle.append(currRunLength+2)
+                    else:
+                        rle.append(currRunLength+1)
+                    currRunLength = 0
             else:
                 rle.append(currRunLength)
                 currRunLength = 0
         return rle
 
     def makeHuffmanCode(self, f):
-        """Constructs a Huffman code using empirical symbol occurrences.
+        """Constructs a Huffman code using empirical symbol occurrences. One leaf
+        of the Huffman tree represents `self.maxLength` contiguous zeros, the others
+        represents a run of zeros (< `self.maxLength`) terminated by a one.
 
         Args:
             f (File): The file object where each line is a '0' or '1'.
@@ -81,4 +94,28 @@ class HuffmanEncoder:
         return ''.join(map(lambda sym: self.codebook[sym], runLengths))
 
     def decode(self, f):
-        assert(self.codebook, "Cannot decode with empty codebook")
+        assert self.codebook is not None, "Cannot decode with empty codebook"
+        invertedIndex = { self.codebook[sym]:sym for sym in self.codebook }
+
+        currBlock = ""
+        runLengths = []
+        for c in f.readlines()[0]: # assumes `f` has single line of '0' and '1'
+            currBlock = currBlock + c
+            if currBlock in invertedIndex:
+                runLengths.append(invertedIndex[currBlock])
+                currBlock = ""
+        assert currBlock == "", "Finished decoding without consuming all input"
+        return "\n".join(self.__rld(runLengths)) + "\n"
+
+    def __rld(self, runLengths):
+        """Undoes run-length encoding."""
+        def rlToSymbols(l):
+            """Converts a run-length `l` into a List of symbols, by decoding into runs of '0's
+            terminated by '1' for `l < self.maxLength` and a contiguous run of '0's for
+            `l == self.maxLength`.
+            """
+            if l < self.maxLength:
+                return "0"*l + "1"
+            else:
+                return "0"*l
+        return reduce(operator.add, map(rlToSymbols, runLengths))

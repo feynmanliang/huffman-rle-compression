@@ -19,7 +19,7 @@ if __name__ == "__main__":
         # TODO: vary maxLength and look at performance
         # see http://www.inference.phy.cam.ac.uk/mackay/LoverH.pdf
 
-        #codebookFromEmpirical("filep.01.10000.txt", "filep_01_1000_codebook.pickle")
+        codebookFromEmpirical("filep.01.10000.txt", "filep_01_1000_codebook.pickle")
 
         # Use empirical probabilities for decoding
         with open("filep_01_1000_codebook.pickle", "r") as codebookFile:
@@ -28,6 +28,3 @@ if __name__ == "__main__":
         encoder = HuffmanEncoder(maxLength=69, codebook=codebook)
         encodedFile = encoder.encode(inFile)
         sys.stdout.write(encodedFile)
-
-        sys.stdout.write(
-
