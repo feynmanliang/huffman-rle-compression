@@ -10,5 +10,13 @@
 pyvenv.cfg
 .venv
 pip-selfcheck.json
+
 .Rproj.user
 .Rhistory
+
+*.fdb_latexmk
+*.fls
+*.pdf
+*.aux
+*.log
+*.out

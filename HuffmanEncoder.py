@@ -14,39 +14,35 @@ class HuffmanEncoder:
         self.maxLength = maxLength
         self.codebook = codebook
 
-    def __rle(self, f):
-        """Performs run-length encoding for runs of zeros.
+    def encode(self, f):
+        """Encodes a corpus. Uses self.codebook if available, otherwise computes self.codebook from
+        the empirical symbol occurrences in `f`.
 
         Args:
             f (File): The file object where each line is a '0' or '1'.
 
         Returns:
-            List[int]: A list of the '0' symbol run lengths in `f`.
+            string: The corpus encoded according to the supplied codebook.
 
         """
-        rle = []
-        currRunLength = 0
-        for rawLine in f:
-            line = int(rawLine.strip())
-            if line == 0:
-                if currRunLength < self.maxLength-2:
-                    currRunLength += 1
-                else: # need to decide to use all zeros or 1 terminated
-                    # TODO: check f.hasNext()
-                    nextSymb = int(next(f).strip())
-                    if nextSymb == 0:
-                        rle.append(currRunLength+2)
-                    else:
-                        rle.append(currRunLength+1)
-                    currRunLength = 0
-            else:
-                rle.append(currRunLength)
-                currRunLength = 0
-        # Instead can pad the decoding (=> smaller compressed file)
-        # append final run
-        # if currRunLength > 0:
-        #     rle.append(currRunLength)
-        return rle
+        runLengths = self.__rle(f)
+        if not self.codebook:
+            self.codebook = HuffmanEncoder.makeHuffmanCodeFromFile(f)
+        return ''.join(map(lambda sym: self.codebook[sym], runLengths))
+
+    def decode(self, f):
+        assert self.codebook is not None, "Cannot decode with empty codebook"
+        invertedIndex = { self.codebook[sym]:sym for sym in self.codebook }
+
+        currBlock = ""
+        runLengths = []
+        for c in f.readlines()[0]: # assumes `f` has single line of '0' and '1'
+            currBlock = currBlock + c
+            if currBlock in invertedIndex:
+                runLengths.append(invertedIndex[currBlock])
+                currBlock = ""
+        assert currBlock == "", "Finished decoding without consuming all input"
+        return "\n".join(self.__rld(runLengths)) + "\n"
 
     def makeHuffmanCodeFromFile(self, f):
         """Overload which first converts File object `f` into empirical probabilities. """
@@ -86,35 +82,39 @@ class HuffmanEncoder:
                 map(lambda x: (x[0], '1' + x[1]), e2[1])
         return (mergedProb, mergedCodes)
 
-    def encode(self, f):
-        """Encodes a corpus. Uses self.codebook if available, otherwise computes self.codebook from
-        the empirical symbol occurrences in `f`.
+    def __rle(self, f):
+        """Performs run-length encoding for runs of zeros.
 
         Args:
             f (File): The file object where each line is a '0' or '1'.
 
         Returns:
-            string: The corpus encoded according to the supplied codebook.
+            List[int]: A list of the '0' symbol run lengths in `f`.
 
         """
-        runLengths = self.__rle(f)
-        if not self.codebook:
-            self.codebook = HuffmanEncoder.makeHuffmanCodeFromFile(f)
-        return ''.join(map(lambda sym: self.codebook[sym], runLengths))
-
-    def decode(self, f):
-        assert self.codebook is not None, "Cannot decode with empty codebook"
-        invertedIndex = { self.codebook[sym]:sym for sym in self.codebook }
-
-        currBlock = ""
-        runLengths = []
-        for c in f.readlines()[0]: # assumes `f` has single line of '0' and '1'
-            currBlock = currBlock + c
-            if currBlock in invertedIndex:
-                runLengths.append(invertedIndex[currBlock])
-                currBlock = ""
-        assert currBlock == "", "Finished decoding without consuming all input"
-        return "\n".join(self.__rld(runLengths)) + "\n"
+        rle = []
+        currRunLength = 0
+        for rawLine in f:
+            line = int(rawLine.strip())
+            if line == 0:
+                if currRunLength < self.maxLength-2:
+                    currRunLength += 1
+                else: # need to decide to use all zeros or 1 terminated
+                    # TODO: check f.hasNext()
+                    nextSymb = int(next(f).strip())
+                    if nextSymb == 0:
+                        rle.append(currRunLength+2)
+                    else:
+                        rle.append(currRunLength+1)
+                    currRunLength = 0
+            else:
+                rle.append(currRunLength)
+                currRunLength = 0
+        # Instead can pad the decoding (=> smaller compressed file)
+        # append final run
+        # if currRunLength > 0:
+        #     rle.append(currRunLength)
+        return rle
 
     def __rld(self, runLengths):
         """Undoes run-length encoding."""

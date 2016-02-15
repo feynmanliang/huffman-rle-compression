@@ -7,4 +7,4 @@ ggplot(data = data, aes(x=maxRunLength, y=numBits, colour=codebook)) +
   geom_line() +
   labs(x="Maximum run length (bits)", y="Size of compressed file (bits)", colour="Codebook")
 
-subset(data, numBits == min(numBits))
+subset(subset(data, codebook == "geometric_codebook.pickle"), numBits == min(numBits))
