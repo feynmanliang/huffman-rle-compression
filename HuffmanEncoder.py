@@ -29,13 +29,13 @@ class HuffmanEncoder:
         the empirical symbol occurrences in `f`.
 
         Args:
-            f (File): The file object where each line is a '0' or '1'.
+            f (File): The file object containing a single line of '0's and '1's
 
         Returns:
             string: The corpus encoded according to the supplied codebook.
 
         >>> huff = HuffmanEncoder()
-        >>> huff.encode(["0","0","0","1","0","0","1"])
+        >>> huff.encode(["0001001"])
         '10'
         >>> huff.codebook
         {2: '0', 3: '1'}
@@ -49,7 +49,8 @@ class HuffmanEncoder:
         """Undoes a Huffman + RLE using self.codebook
 
         Args:
-            f (File): The file object containing the compressed data.
+            f (File): The file object containing the compressed data stored as a single line of
+            '0's and '1's.
 
         Returns:
             string: A string representation of the uncompressed data where each line is a 0 or 1.
@@ -63,13 +64,13 @@ class HuffmanEncoder:
 
         currBlock = ""
         runLengths = []
-        for c in f[0]: # assumes `f` has single line of '0' and '1'
+        for c in list(f)[0]: # assumes `f` has single line of '0' and '1'
             currBlock = currBlock + c
             if currBlock in invertedIndex:
                 runLengths.append(invertedIndex[currBlock])
                 currBlock = ""
         assert currBlock == "", "Finished decoding without consuming all input"
-        return "\n".join(self.__rld(runLengths)) + "\n"
+        return "".join(self.__rld(runLengths))
 
     def makeHuffmanCodeFromFile(self, f):
         """Overload which first converts File object `f` into empirical probabilities. """
@@ -130,28 +131,29 @@ class HuffmanEncoder:
         """Performs run-length encoding for runs of zeros.
 
         Args:
-            f (File): The file object where each line is a '0' or '1'.
+            f (File): The file object containing a single line of '0's and '1's
 
         Returns:
             List[int]: A list of the '0' symbol run lengths in `f`.
 
         >>> huff = HuffmanEncoder(fileSize = 7)
-        >>> huff._HuffmanEncoder__rle('000100001')
+        >>> huff._HuffmanEncoder__rle(['000100001'])
         [3, 4]
-        >>> huff._HuffmanEncoder__rle('00010000')
+        >>> huff._HuffmanEncoder__rle(['00010000'])
         [3]
         """
         rle = []
         currRunLength = 0
-        for rawLine in f:
-            line = int(rawLine.strip())
-            if line == 0:
+        dataIter = iter(list(f)[0])
+        for rawValue in dataIter:
+            value = int(rawValue)
+            if value == 0:
                 if currRunLength < self.maxLength-2:
                     currRunLength += 1
                 else: # need to decide to use all zeros or 1 terminated
                     # TODO: check f.hasNext()
-                    nextSymb = int(next(f).strip())
-                    if nextSymb == 0:
+                    nextValue = int(next(dataIter).strip())
+                    if nextValue == 0:
                         rle.append(currRunLength+2)
                     else:
                         rle.append(currRunLength+1)
