@@ -6,6 +6,6 @@ fi
 if [[ -e decompressed.txt ]]; then
   rm decompressed.txt
 fi
-./squash < filep.01.10000.txt > compressed.txt
+./squash < filep.01.10000NR > compressed.txt
 ./unsquash < compressed.txt > decompressed.txt
-diff filep.01.10000.txt decompressed.txt
+diff filep.01.10000NR decompressed.txt

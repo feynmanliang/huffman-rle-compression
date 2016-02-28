@@ -64,13 +64,13 @@ class HuffmanEncoder:
 
         currBlock = ""
         runLengths = []
-        for c in list(f)[0]: # assumes `f` has single line of '0' and '1'
+        for c in list(f)[0].strip(): # assumes `f` has single line of '0' and '1'
             currBlock = currBlock + c
             if currBlock in invertedIndex:
                 runLengths.append(invertedIndex[currBlock])
                 currBlock = ""
         assert currBlock == "", "Finished decoding without consuming all input"
-        return "".join(self.__rld(runLengths))
+        return "".join(self.__rld(runLengths)) + '\n'
 
     def makeHuffmanCodeFromFile(self, f):
         """Overload which first converts File object `f` into empirical probabilities. """
@@ -144,7 +144,7 @@ class HuffmanEncoder:
         """
         rle = []
         currRunLength = 0
-        dataIter = iter(list(f)[0])
+        dataIter = iter(list(f)[0].strip())
         for rawValue in dataIter:
             value = int(rawValue)
             if value == 0:
