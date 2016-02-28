@@ -41,7 +41,7 @@ if __name__ == "__main__":
     codebookPath= args.codebook
 
     if args.genCodebooks:
-        codebookFromEmpirical("filep.01.10000.txt", "filep_01_1000_codebook.pickle", maxLength)
+        codebookFromEmpirical("filep.01.10000NR", "filep_01_1000_codebook.pickle", maxLength)
         codebookFromGeometric("geometric_codebook.pickle", maxLength)
 
     with open(codebookPath, "r") as codebookFile:
