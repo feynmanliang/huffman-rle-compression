@@ -3,7 +3,7 @@
 \input{../../../../cambridge-macros.tex}
 
 %    Set assignment information here
-\newcommand{\authorname}{Feynman Liang}
+\newcommand{\authorname}{Feynman Liang, Ambrish Rawat}
 \newcommand{\coursename}{MLSALT 6: Information Theory}
 \newcommand{\assignmentname}{Assessed Coursework 2}
 
@@ -111,6 +111,14 @@
   when $P(r=r_{max})$ is a power of $0.5$, hence $r_{max} \in \{69, 2 \times
   69, 3 \times 69, \cdot\}$ are all possible choices. As $r_{max}$ gets larger,
   this becomes less significant because the probability of $r_{max}$ decreases.
+
+  \subsection{Burrows-Wheeler Transform}
+
+  Inspired by programs like \texttt{bzip}, we also investigated applying a BWT
+  to the raw file of bits before compressing. The motivation is that BWT should
+  increase the number of long runs of zeros in an invertible manner, allowing
+  RLE to provide more compression without any loss of data.
+
 
 
 \end{solution}
